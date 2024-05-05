@@ -1,0 +1,64 @@
+diff --git a/csslint/CMakeLists.txt b/csslint/CMakeLists.txt
+index 8f125c8..ef35ef3 100644
+--- a/csslint/CMakeLists.txt
++++ b/csslint/CMakeLists.txt
+@@ -12,5 +12,6 @@ target_include_directories(${csslint_EXE}
+ 
+ target_link_libraries(${csslint_EXE}
+     PRIVATE
+-    croco_LIB
++    ${GLIB_LDFLAGS}
++    croco
+ )
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 077c847..9e09754 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -66,9 +66,14 @@ set(libcroco_SRC
+     ${libcroco_headers}
+ )
+ 
+-add_library(croco_LIB STATIC "${libcroco_SRC}")
++if (LIBCROCO_STANDALONE)
++add_library(croco "${libcroco_SRC}")
++else()
++add_library(croco STATIC "${libcroco_SRC}")
++endif()
+ 
+-target_include_directories(croco_LIB
++
++target_include_directories(croco
+     PRIVATE
+     ${CMAKE_CURRENT_BINARY_DIR}
+     ${LIBXML_INCLUDE_DIRS}
+@@ -76,10 +81,15 @@ target_include_directories(croco_LIB
+     ${GLIB_INCLUDE_DIRS}
+ )
+ 
+-target_link_libraries(croco_LIB
++target_link_libraries(croco
+     PRIVATE
+     ${GLIB_LDFLAGS}
+     INTERFACE
+     ${LIBXML_LDFLAGS}
+     m
+ )
++
++install(
++    TARGETS
++    croco
++)
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 1ffb908..a461bf8 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -22,7 +22,8 @@ foreach(source ${testprogs})
+     )
+ 
+     target_link_libraries(${source}
+-        croco_LIB
++        ${GLIB_LDFLAGS}
++        croco
+     )
+ endforeach()
+ 
